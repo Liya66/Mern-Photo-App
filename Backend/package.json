@@ -1,0 +1,18 @@
+{
+  "name": "liya_pin_api",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch --env-file=.env index.js"
+  },
+  "dependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
+    "emoji-picker-react": "^4.12.2",
+    "eslint": "^9.23.0",
+    "express": "^5.1.0",
+    "imagekitio-react": "^4.3.0",
+    "react-router": "^7.4.0",
+    "react-scripts": "^5.0.1",
+    "svgo": "^3.3.2"
+  }
+}
