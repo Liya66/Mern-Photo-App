@@ -5,15 +5,16 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import apiRequest from '../../utils/apiRequest'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
-const Gallery = ({ search, userId, boardId }) => {
+const Gallery = ({ search, userId, boardId, loop }) => {
     const { data, fetchNextPage, hasNextPage, status } = useInfiniteQuery({
-        queryKey: ['pins', search, userId, boardId],
+        queryKey: ['pins', search, userId, boardId, loop],
         queryFn: async ({ pageParam }) => {
             const params = new URLSearchParams();
             if (pageParam) params.set('cursor', pageParam);
             if (search) params.set('search', search);
             if (userId) params.set('userId', userId);
             if (boardId) params.set('boardId', boardId);
+            if (loop) params.set('loop', 'true');
             const res = await apiRequest.get(`/pins?${params.toString()}`);
             return res.data;
         },
@@ -34,8 +35,8 @@ const Gallery = ({ search, userId, boardId }) => {
             loader={<Skeleton />}
         >
             <div className='gallery'>
-                {allPins.map(item => (
-                    <GalleryItem key={item._id} item={item} />
+                {allPins.map((item, index) => (
+                    <GalleryItem key={`${item._id}-${index}`} item={item} />
                 ))}
             </div>
         </InfiniteScroll>

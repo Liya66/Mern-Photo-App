@@ -3,7 +3,7 @@ import Gallery from '../../components/gallery/gallery'
 
 const Homepage = () => {
     return (
-        <Gallery />
+        <Gallery loop />
     )
 }
 

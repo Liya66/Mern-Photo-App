@@ -12,12 +12,17 @@ const imagekit = new ImageKit({
 });
 
 export const getPins = async (req, res) => {
-  const { cursor, search, userId, boardId } = req.query;
+  const { cursor, search, userId, boardId, loop } = req.query;
   const limit = 21;
 
+  // Cursors carry a generation suffix so each pass through the pins yields
+  // distinct page params; without it React Query would collapse repeat pages.
+  let generation = 0;
   let query = {};
   if (cursor) {
-    query._id = { $lt: cursor };
+    const [id, gen] = cursor.split(":");
+    generation = Number(gen) || 0;
+    if (id !== "wrap") query._id = { $lt: id };
   }
   if (search) {
     query.$or = [
@@ -37,9 +42,15 @@ export const getPins = async (req, res) => {
 
   const hasMore = pins.length > limit;
   const resultPins = hasMore ? pins.slice(0, limit) : pins;
-  const nextCursor = hasMore ? resultPins[resultPins.length - 1]._id : null;
 
-  res.status(200).json({ pins: resultPins, nextCursor, hasMore });
+  let nextCursor = null;
+  if (hasMore) {
+    nextCursor = `${resultPins[resultPins.length - 1]._id}:${generation}`;
+  } else if (loop === "true" && resultPins.length > 0) {
+    nextCursor = `wrap:${generation + 1}`;
+  }
+
+  res.status(200).json({ pins: resultPins, nextCursor, hasMore: !!nextCursor });
 };
 
 export const getPin = async (req, res) => {
