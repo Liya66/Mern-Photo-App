@@ -38,7 +38,7 @@ const UserButton = () => {
                     <Link to={`/${currentUser.username}`} className="userOption">
                         Profile
                     </Link>
-                    <div className="userOption">Settings</div>
+                    <Link to="/settings" className="userOption">Settings</Link>
                     <div className="userOption" onClick={handleLogout}>
                         Logout
                     </div>

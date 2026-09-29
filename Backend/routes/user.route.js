@@ -5,11 +5,13 @@ import {
   loginUser,
   logoutUser,
   followUser,
+  updateUser,
 } from "../controllers/user.controller.js";
 import verifyToken from "../middlewares/verifyToken.js";
 
 const router = express.Router();
 
+router.put("/", verifyToken, updateUser);
 router.get("/:username", getUser);
 router.post("/auth/register", registerUser);
 router.post("/auth/login", loginUser);

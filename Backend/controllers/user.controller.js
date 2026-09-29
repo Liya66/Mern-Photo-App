@@ -2,6 +2,13 @@ import User from "../models/user.model.js";
 import Follow from "../models/follow.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import ImageKit from "imagekit";
+
+const imagekit = new ImageKit({
+  publicKey: process.env.IK_PUBLIC_KEY,
+  privateKey: process.env.IK_PRIVATE_KEY,
+  urlEndpoint: process.env.IK_URL_ENDPOINT,
+});
 
 export const getUser = async (req, res) => {
   const user = await User.findOne({ username: req.params.username });
@@ -102,4 +109,27 @@ export const followUser = async (req, res) => {
 
   await Follow.create({ follower: req.userId, following: user._id });
   res.status(200).json("Followed!");
+};
+
+export const updateUser = async (req, res) => {
+  const user = await User.findById(req.userId);
+  if (!user) return res.status(404).json("User not found!");
+
+  const { displayName } = req.body;
+  if (displayName) user.displayName = displayName;
+
+  if (req.files?.img) {
+    const file = req.files.img;
+    const uploadResponse = await imagekit.upload({
+      file: file.data,
+      fileName: `avatar_${req.userId}_${Date.now()}`,
+      folder: "/avatars",
+    });
+    user.img = uploadResponse.filePath;
+  }
+
+  await user.save();
+
+  const { hashedPassword, ...userInfo } = user._doc;
+  res.status(200).json(userInfo);
 };

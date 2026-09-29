@@ -9,6 +9,7 @@ import CreatePage from './routes/creatPage/createPage'
 import AuthPage from './routes/authPage/authPage'
 import ProfilePage from './routes/profilePage/profilePage';
 import SearchPage from './routes/searchPage/searchPage';
+import SettingsPage from './routes/settingsPage/settingsPage';
 import MainLayout from './routes/layouts/mainLayout';
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/create" element={<CreatePage />} />
             <Route path="/:username" element={<ProfilePage />} />
             <Route path="/search" element={<SearchPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
           </Route>
           <Route path="/auth" element={<AuthPage />} />
         </Routes>

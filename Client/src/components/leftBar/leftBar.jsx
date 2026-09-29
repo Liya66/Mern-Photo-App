@@ -23,7 +23,7 @@ const LeftBar = () => {
                 </Link>
 
             </div>
-            <Link to="/" className='menuIcon'>
+            <Link to="/settings" className='menuIcon'>
                 <img src="/general/settings.svg" alt="" />
             </Link>
         </div>
