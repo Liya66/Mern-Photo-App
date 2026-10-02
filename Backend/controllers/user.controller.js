@@ -10,6 +10,19 @@ const imagekit = new ImageKit({
   urlEndpoint: process.env.IK_URL_ENDPOINT,
 });
 
+const isProduction = process.env.NODE_ENV === "production";
+
+// In production the client and API are on different sites, so the auth cookie
+// needs SameSite=None or the browser drops it. Browsers only honor that over
+// HTTPS, hence secure. clearCookie must repeat these or the cookie won't clear.
+const cookieOptions = {
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: isProduction ? "none" : "lax",
+};
+
+const TOKEN_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
+
 export const getUser = async (req, res) => {
   const user = await User.findOne({ username: req.params.username });
   if (!user) return res.status(404).json("User not found!");
@@ -57,11 +70,7 @@ export const registerUser = async (req, res) => {
   const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
 
   res
-    .cookie("token", token, {
-      httpOnly: true,
-      secure: false,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    })
+    .cookie("token", token, { ...cookieOptions, maxAge: TOKEN_MAX_AGE })
     .status(201)
     .json(userInfo);
 };
@@ -80,17 +89,13 @@ export const loginUser = async (req, res) => {
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
 
   res
-    .cookie("token", token, {
-      httpOnly: true,
-      secure: false,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    })
+    .cookie("token", token, { ...cookieOptions, maxAge: TOKEN_MAX_AGE })
     .status(200)
     .json(userInfo);
 };
 
 export const logoutUser = (req, res) => {
-  res.clearCookie("token").status(200).json("Logged out!");
+  res.clearCookie("token", cookieOptions).status(200).json("Logged out!");
 };
 
 export const followUser = async (req, res) => {

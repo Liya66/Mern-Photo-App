@@ -10,7 +10,10 @@ import boardRouter from "./routes/board.route.js";
 
 const app = express();
 
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+const PORT = process.env.PORT || 3000;
+const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
+
+app.use(cors({ origin: CLIENT_URL, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(fileUpload());
@@ -20,7 +23,7 @@ app.use("/pins", pinRouter);
 app.use("/comments", commentRouter);
 app.use("/boards", boardRouter);
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
   connectDB();
-  console.log("Server is running on port 3000");
+  console.log(`Server is running on port ${PORT}`);
 });
